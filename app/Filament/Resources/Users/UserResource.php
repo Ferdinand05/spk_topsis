@@ -9,9 +9,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -28,7 +30,17 @@ class UserResource extends Resource
     {
         return $schema
             ->components([
-                //
+                TextInput::make('name')
+                    ->label("Name")
+                    ->required(),
+                TextInput::make("email")
+                    ->required()
+                    ->label("Email"),
+                TextInput::make("password")
+                    ->password()
+                    ->required()
+                    ->hiddenOn("edit")
+                    ->minLength(7)
             ]);
     }
 
@@ -36,7 +48,13 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make("name")
+                    ->label("Name"),
+                TextColumn::make("email")
+                    ->label("Email"),
+                TextColumn::make("created_at")
+                    ->label("Tgl. Bergabung")
+
             ])
             ->filters([
                 //
