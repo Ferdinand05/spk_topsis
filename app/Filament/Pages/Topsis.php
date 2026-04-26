@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Ai\Agents\TopsisAgent;
 use App\Filament\Widgets\TopsisRankChart;
 use App\Models\Alternative;
 use App\Models\Calculation;
@@ -22,7 +23,6 @@ class Topsis extends Page
     protected static string | UnitEnum | null $navigationGroup = 'Perhitungan';
     protected static ?string $navigationLabel = 'TOPSIS';
 
-
     public $calculation_id = null;
     public $calculations = [];
 
@@ -38,6 +38,7 @@ class Topsis extends Page
     public $distanceNegative = [];
 
     public $results = [];
+    public $aiConclusion = null;
     public $disabledHitung = true;
     public function mount(): void
     {
@@ -62,6 +63,7 @@ class Topsis extends Page
             $this->idealNegative = [];
             $this->distancePositive = [];
             $this->distanceNegative = [];
+            $this->aiConclusion = null;
 
             return;
         }
@@ -86,6 +88,7 @@ class Topsis extends Page
         $this->idealNegative = [];
         $this->distancePositive = [];
         $this->distanceNegative = [];
+        $this->aiConclusion = null;
     }
 
     public function hitung()
@@ -187,6 +190,7 @@ class Topsis extends Page
         $this->idealNegative = $idealNeg;
         $this->distancePositive = $dPos;
         $this->distanceNegative = $dNeg;
+        $this->aiConclusion = null;
 
         DB::transaction(function () use ($results) {
             Result::where('calculation_id', $this->calculation_id)->delete();
@@ -202,6 +206,73 @@ class Topsis extends Page
         });
 
         $this->results = $results;
+    }
+
+    public function generateConclusion()
+    {
+        if (empty($this->results)) {
+            $this->aiConclusion = 'Silakan jalankan perhitungan TOPSIS terlebih dahulu sebelum meminta kesimpulan AI.';
+
+            return;
+        }
+
+        $calculation = collect($this->calculations)
+            ->firstWhere('id', $this->calculation_id) ?? [];
+
+        $criteria = collect($this->criteria)->map(function (array $crit) {
+            return [
+                'id' => $crit['id'],
+                'code' => $crit['code'],
+                'name' => $crit['name'],
+                'weight' => $crit['weight'],
+                'type' => $crit['type'],
+            ];
+        })->values()->all();
+
+        $alternatives = collect($this->alternatives)->map(function (array $alt) {
+            return [
+                'id' => $alt['id'],
+                'code' => $alt['code'],
+                'name' => $alt['name'],
+            ];
+        })->values()->all();
+
+        $results = collect($this->results)->values()->map(function (array $result, int $index) {
+            return [
+                'rank' => $index + 1,
+                'id' => $result['id'],
+                'name' => $result['name'],
+                'score' => $result['score'],
+                'd_plus' => $result['d_plus'],
+                'd_minus' => $result['d_minus'],
+            ];
+        })->all();
+
+        $matrices = [
+            'normalized' => $this->normalizedMatrix,
+            'weighted' => $this->weightedMatrix,
+            'ideal_positive' => $this->idealPositive,
+            'ideal_negative' => $this->idealNegative,
+            'distance_positive' => $this->distancePositive,
+            'distance_negative' => $this->distanceNegative,
+        ];
+
+        try {
+            $response = TopsisAgent::make()
+                ->conclude(
+                    calculation: $calculation,
+                    criteria: $criteria,
+                    alternatives: $alternatives,
+                    results: $results,
+                    matrices: $matrices,
+                );
+
+            $this->aiConclusion = (string) $response;
+        } catch (\Throwable $e) {
+            report($e);
+
+            $this->aiConclusion = 'Gagal menghasilkan kesimpulan AI. Silakan cek kembali konfigurasi Gemini API key dan model yang dipakai.';
+        }
     }
 
     private function getScore($i, $j)
@@ -239,10 +310,27 @@ class Topsis extends Page
 
 
 
-    protected function getFooterWidgets(): array
+    public function getWidgetData(): array
     {
         return [
-            TopsisRankChart::class
+            'stats' => [
+                'calculation_id' => $this->calculation_id,
+            ],
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        if (!$this->calculation_id) {
+            return []; // ❌ jangan tampilkan widget
+        }
+
+        return [
+            TopsisRankChart::make([
+                'stats' => [
+                    'calculation_id' => $this->calculation_id
+                ]
+            ])
         ];
     }
 }
