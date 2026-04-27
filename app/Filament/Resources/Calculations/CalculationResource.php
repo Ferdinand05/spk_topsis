@@ -5,6 +5,8 @@ namespace App\Filament\Resources\Calculations;
 use App\Filament\Resources\Calculations\Pages\ManageCalculations;
 use App\Models\Calculation;
 use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -15,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 class CalculationResource extends Resource
@@ -56,6 +59,31 @@ class CalculationResource extends Resource
                 //
             ])
             ->recordActions([
+                Action::make("print")
+                    ->label("PDF")
+                    ->icon(Heroicon::Printer)
+                    ->color("secondary")
+                    ->action(function (Calculation $calculation) {
+                        $calculation->load([
+                            'criteria' => fn($query) => $query->orderBy('id'),
+                            'alternatives' => fn($query) => $query->orderBy('id'),
+                            'scores' => fn($query) => $query->orderBy('alternative_id')->orderBy('criteria_id'),
+                            'results' => fn($query) => $query->with('alternative')->orderBy('rank'),
+                        ]);
+
+                        $pdf = Pdf::loadView('pdf.pdf', compact('calculation'))
+                            ->setPaper('a4');
+
+                        return response()->streamDownload(
+                            function () use ($pdf) {
+                                echo $pdf->output();
+                            },
+                            'topsis-' . Str::slug($calculation->name ?: 'calculation') . '.pdf'
+                        );
+                    })
+                    ->disabled(function (Calculation $calculation) {
+                        return $calculation->results()->count() === 0;
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
