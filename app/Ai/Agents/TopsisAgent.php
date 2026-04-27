@@ -53,22 +53,41 @@ class TopsisAgent implements Agent, Conversational, HasTools
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?: '{}';
 
         return <<<PROMPT
-        Gunakan data TOPSIS berikut untuk membuat kesimpulan.
+        Gunakan data hasil TOPSIS berikut untuk membuat kesimpulan.
 
         Data:
         {$json}
 
         Instruksi:
-        - Jelaskan hasil berdasarkan ranking yang sudah ada tidak perlu menyebutkan satu persatu ranking lagi.
-        - Sebutkan alternatif terbaik dan mengapa ia unggul secara umum.
-        - Jika memungkinkan, singgung kriteria benefit/cost secara singkat.
-        - Berikan kesimpulan dan alternatif pengganti selain alternatif ranking 1.
-        - gunakan kata yang mudah dimengerti, jangan bertele-tele dan terlalu panjang.
-        - Jangan mengarang data baru.
-        - Jangan membulatkan / merubah angka.
-        - Jangan menuliskan proses perhitungan ulang.
+        1. Fokus hanya pada interpretasi hasil, bukan perhitungan.
+        2. Jangan menyebutkan ulang seluruh ranking.
+        3. Sebutkan:
+        - Alternatif terbaik (ranking 1)
+        - Alasan umum mengapa alternatif tersebut unggul
+        4. Singgung secara singkat pengaruh kriteria:
+        - benefit (nilai tinggi lebih baik)
+        - cost (nilai rendah lebih baik)
+        5. Berikan 1 alternatif cadangan terbaik (ranking 2) sebagai rekomendasi pengganti.
+        6. Gunakan bahasa sederhana, jelas, dan tidak bertele-tele (maksimal 3 paragraf pendek).
+        7. Gunakan data yang tersedia saja (dilarang mengarang atau mengubah angka).
+        8. Jangan menampilkan rumus atau proses perhitungan.
+        9. Tarik kesimpulan secara mendalam dan berikan saran jika perlu
 
-        Keluarkan jawaban sesuai format instruksi agent.
+        Format output WAJIB:
+
+        **Alternatif Terbaik**
+        <isi>
+
+        **Analisis Singkat**
+        <isi>
+
+        **Rekomendasi Alternatif**
+        <isi>
+
+        Larangan:
+        - Jangan mengulang daftar ranking
+        - Jangan membuat paragraf panjang
+        - Jangan keluar dari format di atas
         PROMPT;
     }
 

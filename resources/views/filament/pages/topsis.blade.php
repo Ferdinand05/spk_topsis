@@ -151,10 +151,13 @@
                     Hitung TOPSIS
                 </button>
 
-                <button wire:click="generateConclusion" wire:loading.attr="disabled" wire:bind:disabled="disabledAi"
-                    class="inline-flex items-center rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200 dark:hover:bg-emerald-950">
-                    Analisis AI
-                </button>
+                @if (!$aiConclusion)
+                    <button wire:click="generateConclusion" wire:loading.attr="disabled"
+                        wire:bind:disabled="disabledAi "
+                        class="inline-flex items-center rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200 dark:hover:bg-emerald-950">
+                        Analisis AI
+                    </button>
+                @endif
             </div>
 
             @if ($results)
