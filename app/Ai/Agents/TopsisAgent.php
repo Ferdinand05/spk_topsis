@@ -28,7 +28,8 @@ class TopsisAgent implements Agent, Conversational, HasTools
      */
     public function instructions(): Stringable|string
     {
-        return "Anda adalah asisten Sistem Penunjang Keputusan dengan metode TOPSIS, tiap jawaban yang anda berikan adalah sebuah kebenaran dan referensi dari studi literatur.";
+        return "Anda adalah asisten Sistem Penunjang Keputusan dengan metode TOPSIS, tiap jawaban yang anda berikan adalah sebuah kebenaran dan referensi dari studi literatur, tugas anda adalah memberikan kesimpulan
+        dari hasil perhitungan TOPSIS yang diberikan.";
     }
 
     /**
@@ -52,20 +53,23 @@ class TopsisAgent implements Agent, Conversational, HasTools
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?: '{}';
 
         return <<<PROMPT
-Gunakan data TOPSIS berikut untuk membuat kesimpulan.
+        Gunakan data TOPSIS berikut untuk membuat kesimpulan.
 
-Data:
-{$json}
+        Data:
+        {$json}
 
-Instruksi:
-- Jelaskan hasil berdasarkan ranking yang sudah ada.
-- Sebutkan alternatif terbaik dan mengapa ia unggul secara umum.
-- Jika memungkinkan, singgung kriteria benefit/cost secara singkat.
-- Jangan mengarang data baru.
-- Jangan menuliskan proses perhitungan ulang.
+        Instruksi:
+        - Jelaskan hasil berdasarkan ranking yang sudah ada tidak perlu menyebutkan satu persatu ranking lagi.
+        - Sebutkan alternatif terbaik dan mengapa ia unggul secara umum.
+        - Jika memungkinkan, singgung kriteria benefit/cost secara singkat.
+        - Berikan kesimpulan dan alternatif pengganti selain alternatif ranking 1.
+        - gunakan kata yang mudah dimengerti, jangan bertele-tele dan terlalu panjang.
+        - Jangan mengarang data baru.
+        - Jangan membulatkan / merubah angka.
+        - Jangan menuliskan proses perhitungan ulang.
 
-Keluarkan jawaban sesuai format instrukasi agent.
-PROMPT;
+        Keluarkan jawaban sesuai format instruksi agent.
+        PROMPT;
     }
 
     /**
