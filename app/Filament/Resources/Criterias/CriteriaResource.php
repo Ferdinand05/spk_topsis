@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Criterias;
 
 use App\Filament\Resources\Criterias\Pages\ManageCriterias;
+use App\Models\Calculation;
 use App\Models\Criteria;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
@@ -59,6 +60,7 @@ class CriteriaResource extends Resource
                     ->numeric()
                     ->minValue(1)
                     ->maxValue(5)
+                    ->helperText("Gunakan skala kepentingan 1 - 5")
                     ->label("Bobot"),
                 Select::make('type')
                     ->options([
@@ -70,7 +72,11 @@ class CriteriaResource extends Resource
                 Select::make("calculation_id")
                     ->label("Nama Perhitungan")
                     ->required()
-                    ->relationship("calculation", "name")
+                    ->options(function () {
+                        return Calculation::orderBy("created_at", "desc")->get()->pluck("name", "id");
+                    })
+                    ->helperText("Pilih Peruntukan Perhitungan"),
+
             ]);
     }
 
