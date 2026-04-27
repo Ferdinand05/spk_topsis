@@ -40,6 +40,7 @@ class Topsis extends Page
     public $results = [];
     public $aiConclusion = null;
     public $disabledHitung = true;
+    public $disabledAi = true;
     public function mount(): void
     {
         $this->calculations = Calculation::orderBy('name')->get()->toArray();
@@ -206,6 +207,9 @@ class Topsis extends Page
         });
 
         $this->results = $results;
+
+
+        $this->disabledAi = false;
     }
 
     public function generateConclusion()
@@ -322,7 +326,7 @@ class Topsis extends Page
     protected function getFooterWidgets(): array
     {
         if (!$this->calculation_id) {
-            return []; // ❌ jangan tampilkan widget
+            return [];
         }
 
         return [

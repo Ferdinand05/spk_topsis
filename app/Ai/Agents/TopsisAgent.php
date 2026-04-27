@@ -28,7 +28,8 @@ class TopsisAgent implements Agent, Conversational, HasTools
      */
     public function instructions(): Stringable|string
     {
-        return "Anda adalah asisten Sistem Penunjang Keputusan dengan metode TOPSIS, tiap jawaban yang anda berikan adalah sebuah kebenaran dan referensi dari studi literatur.";
+        return "Anda adalah asisten Sistem Penunjang Keputusan dengan metode TOPSIS, tiap jawaban yang anda berikan adalah sebuah kebenaran dan referensi dari studi literatur, tugas anda adalah memberikan kesimpulan
+        dari hasil perhitungan TOPSIS yang diberikan.";
     }
 
     /**
@@ -52,20 +53,42 @@ class TopsisAgent implements Agent, Conversational, HasTools
         $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) ?: '{}';
 
         return <<<PROMPT
-Gunakan data TOPSIS berikut untuk membuat kesimpulan.
+        Gunakan data hasil TOPSIS berikut untuk membuat kesimpulan.
 
-Data:
-{$json}
+        Data:
+        {$json}
 
-Instruksi:
-- Jelaskan hasil berdasarkan ranking yang sudah ada.
-- Sebutkan alternatif terbaik dan mengapa ia unggul secara umum.
-- Jika memungkinkan, singgung kriteria benefit/cost secara singkat.
-- Jangan mengarang data baru.
-- Jangan menuliskan proses perhitungan ulang.
+        Instruksi:
+        1. Fokus hanya pada interpretasi hasil, bukan perhitungan.
+        2. Jangan menyebutkan ulang seluruh ranking.
+        3. Sebutkan:
+        - Alternatif terbaik (ranking 1)
+        - Alasan umum mengapa alternatif tersebut unggul
+        4. Singgung secara singkat pengaruh kriteria:
+        - benefit (nilai tinggi lebih baik)
+        - cost (nilai rendah lebih baik)
+        5. Berikan 1 alternatif cadangan terbaik (ranking 2) sebagai rekomendasi pengganti.
+        6. Gunakan bahasa sederhana, jelas, dan tidak bertele-tele (maksimal 3 paragraf pendek).
+        7. Gunakan data yang tersedia saja (dilarang mengarang atau mengubah angka).
+        8. Jangan menampilkan rumus atau proses perhitungan.
+        9. Tarik kesimpulan secara mendalam dan berikan saran jika perlu
 
-Keluarkan jawaban sesuai format instrukasi agent.
-PROMPT;
+        Format output WAJIB:
+
+        **Alternatif Terbaik**
+        <isi>
+
+        **Analisis Singkat**
+        <isi>
+
+        **Rekomendasi Alternatif**
+        <isi>
+
+        Larangan:
+        - Jangan mengulang daftar ranking
+        - Jangan membuat paragraf panjang
+        - Jangan keluar dari format di atas
+        PROMPT;
     }
 
     /**
