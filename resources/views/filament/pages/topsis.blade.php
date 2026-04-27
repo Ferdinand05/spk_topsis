@@ -118,12 +118,17 @@
                                 <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/60">
                                     <td
                                         class="sticky left-0 z-10 bg-white px-4 py-3 font-medium text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-                                        {{ $alt['name'] }}
+                                        <span class="text-gray-500">
+                                            {{ $alt['code'] }}
+                                        </span>
+                                        <span>
+                                            {{ ' ' . $alt['name'] }}
+                                        </span>
                                     </td>
 
                                     @foreach ($criteriaItems as $crit)
                                         <td class="px-4 py-3">
-                                            <input type="number" step="any"
+                                            <input type="number" step="any" required="true"
                                                 wire:model="scores.{{ $alt['id'] }}.{{ $crit['id'] }}"
                                                 class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm transition focus:border-slate-400 focus:ring-0 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:focus:border-slate-500">
                                         </td>
@@ -141,9 +146,14 @@
                     Simpan Nilai
                 </button>
 
-                <button wire:click="hitung" wire:loading.attr="disabled"
+                <button wire:click="hitung" wire:loading.attr="disabled" wire:bind:disabled="disabledHitung"
                     class="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
                     Hitung TOPSIS
+                </button>
+
+                <button wire:click="generateConclusion" wire:loading.attr="disabled"
+                    class="inline-flex items-center rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-800 shadow-sm transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200 dark:hover:bg-emerald-950">
+                    Analisis AI
                 </button>
             </div>
 
@@ -242,6 +252,21 @@
                         </div>
                     </div>
                 </div>
+
+                @if ($aiConclusion)
+                    <div
+                        class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm dark:border-emerald-900 dark:bg-emerald-950/30">
+
+                        <h3 class="text-base font-semibold text-emerald-900 dark:text-emerald-100">
+                            Kesimpulan AI
+                        </h3>
+
+                        <p class="prose prose-sm mt-3 max-w-none dark:prose-invert">
+                            {!! \Illuminate\Support\Str::markdown($aiConclusion) !!}
+                        </p>
+
+                    </div>
+                @endif
 
                 <div class="space-y-6">
                     <div
