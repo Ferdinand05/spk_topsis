@@ -462,16 +462,34 @@
 
                 @if ($aiConclusion)
                     <div
-                        class="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 shadow-sm dark:border-emerald-900 dark:bg-emerald-950/30">
+                        class="rounded-2xl border border-emerald-200 bg-white p-6 shadow-sm ring-1 ring-emerald-100 dark:border-emerald-900 dark:bg-slate-900 dark:ring-emerald-950/40">
+                        <div
+                            class="flex items-start gap-3 border-b border-emerald-100 pb-4 dark:border-emerald-900/60">
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-200">
+                                <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path
+                                        d="M10 2a1 1 0 0 1 1 1v1.09a5.002 5.002 0 0 1 3.9 3.9H16a1 1 0 1 1 0 2h-1.1a5.002 5.002 0 0 1-3.9 3.9V15a1 1 0 1 1-2 0v-1.11a5.002 5.002 0 0 1-3.9-3.9H4a1 1 0 1 1 0-2h1.1a5.002 5.002 0 0 1 3.9-3.9V3a1 1 0 0 1 1-1Zm0 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+                                </svg>
+                            </div>
 
-                        <h3 class="text-base font-semibold text-emerald-900 dark:text-emerald-100">
-                            Hasilil Analisis & Kesimpulan AI
-                        </h3>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <h3 class="text-base font-semibold text-emerald-900 dark:text-emerald-100">
+                                        Hasil Analisis & Kesimpulan AI
+                                    </h3>
 
-                        <p class="prose prose-sm mt-3 max-w-none dark:prose-invert">
+                                </div>
+                                <p class="mt-1 text-sm leading-6 text-emerald-800/90 dark:text-emerald-200/90">
+                                    Ringkasan berikut dibuat agar keputusan lebih mudah dipahami.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="prose prose-sm mt-4 max-w-none text-slate-700 prose-headings:mt-5 prose-headings:mb-2 prose-headings:text-slate-900 prose-p:my-2 prose-p:leading-7 prose-li:my-1 prose-li:leading-7 prose-strong:text-slate-900 prose-a:text-emerald-700 prose-a:no-underline hover:prose-a:underline dark:prose-invert dark:text-slate-200 dark:prose-headings:text-slate-100 dark:prose-strong:text-slate-100 dark:prose-a:text-emerald-300">
                             {!! \Illuminate\Support\Str::markdown($aiConclusion) !!}
-                        </p>
-
+                        </div>
                     </div>
                 @endif
 

@@ -3,6 +3,7 @@
 namespace App\Ai\Agents;
 
 use Laravel\Ai\Ai;
+use Laravel\Ai\Attributes\Model;
 use Laravel\Ai\Attributes\Provider;
 use Laravel\Ai\Attributes\Temperature;
 use Laravel\Ai\Attributes\Timeout;
@@ -18,6 +19,7 @@ use Stringable;
 
 
 #[Temperature(0.3)]
+#[Model('deepseek-v4-pro')]
 #[Timeout(120)]
 class TopsisAgent implements Agent, Conversational, HasTools
 {
@@ -99,7 +101,9 @@ class TopsisAgent implements Agent, Conversational, HasTools
     ): AgentResponse {
         return $this->prompt(
             $this->buildConclusionPrompt($calculation, $criteria, $alternatives, $results, $matrices, $sawResults),
-            provider: [Lab::Gemini, Lab::Groq],
+            provider: [Lab::DeepSeek, Lab::Groq],
+            model: 'deepseek-v4-pro'
+
         );
     }
 
